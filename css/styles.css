@@ -1,14 +1,10 @@
-div {
-  background: blue;
-  color: white;
+ul {
+  list-style-type: none;
+  background: cadetblue;
 }
-.none {
-  display: none;
+li {
+  display: inline-block;
 }
-.opacity {
-  opacity: 1;
-  cursor: pointer;
-}
-.visibility {
-  visibility: hidden;
+.nav {
+  float: right;
 }
