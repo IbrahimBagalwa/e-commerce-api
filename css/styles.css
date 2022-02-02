@@ -1,8 +1,14 @@
-.block {
-  background: black;
+div {
+  background: blue;
   color: white;
 }
-
-.iniline {
-  background: cadetblue;
+.none {
+  display: none;
+}
+.opacity {
+  opacity: 1;
+  cursor: pointer;
+}
+.visibility {
+  visibility: hidden;
 }
