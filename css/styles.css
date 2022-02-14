@@ -3,7 +3,7 @@
   padding: 0;
   box-sizing: border-box;
 }
-div {
+/* div {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -11,7 +11,7 @@ div {
   text-align: center;
   color: cadetblue;
   font-size: 40px;
-}
+} */
 
 .one {
   background: url("../html/images/big.jpeg");
@@ -36,11 +36,32 @@ div {
   background: blanchedalmond;
   float: left;
   width: 30.33%;
-  height: 150px;
+  height: 150vh;
 }
 .l-three {
   background: yellowgreen;
   float: left;
   width: 30.33%;
-  height: 150px;
+  height: 150vh;
+}
+.scrol {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  color: cadetblue;
+  display: flex;
+  justify-content: end;
+}
+.stick {
+  clear: both;
+  padding-bottom: 2000px;
+}
+.after {
+  clear: both;
+}
+.hello {
+  position: sticky;
+  top: 0;
+  clear: both;
 }
