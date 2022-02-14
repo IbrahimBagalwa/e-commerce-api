@@ -3,7 +3,7 @@
   padding: 0;
   box-sizing: border-box;
 }
-div {
+/* div {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -11,7 +11,7 @@ div {
   text-align: center;
   color: cadetblue;
   font-size: 40px;
-}
+} */
 
 .one {
   background: url("../html/images/big.jpeg");
@@ -23,4 +23,27 @@ div {
 .two {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     url("../html/images/big.jpeg") center/cover no-repeat fixed;
+}
+
+.laout {
+  padding: 5px;
+}
+
+.l-one {
+  background: red;
+  float: left;
+  width: 30.33%;
+  height: 150px;
+}
+.l-two {
+  background: blanchedalmond;
+  float: left;
+  width: 30.33%;
+  height: 150px;
+}
+.l-three {
+  background: yellowgreen;
+  float: left;
+  width: 30.33%;
+  height: 150px;
 }
