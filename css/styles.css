@@ -14,9 +14,13 @@ div {
 }
 
 .one {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("../html/images/big.jpeg") center/cover no-repeat fixed;
+  background: url("../html/images/big.jpeg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 .two {
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../html/images/big.jpeg") center/cover no-repeat fixed;
 }
