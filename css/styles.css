@@ -7,7 +7,7 @@ img {
   width: 100%;
   display: block;
 }
-/* div::before {
+div::before {
   content: "";
   border: 2px solid grey;
   width: 100%;
@@ -30,7 +30,7 @@ div::after {
   position: absolute;
   z-index: -1;
   transition: all 0.5s linear;
-} */
+}
 div::after {
   content: "Bonjour merci de me toucher";
   width: 100%;
