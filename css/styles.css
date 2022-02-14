@@ -1,20 +1,29 @@
 div {
-  background: cadetblue;
-  margin: 10px;
-  color: black;
+  min-height: 100vh;
+  text-transform: uppercase;
+  color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
-.none {
-  display: none;
+.big-img {
+  background: url("../html/images/big.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
-.opacity-1 {
-  opacity: 1;
+.small-img {
+  border: 2px solid red;
+  background: url("../html/images/5666.resized.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
-.opacity-05 {
-  opacity: 0.5;
-}
-.opacity-075 {
-  opacity: 0.75;
-}
-.visibility {
-  visibility: hidden;
+.folder-img {
+  background: url("../html/images/background.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
