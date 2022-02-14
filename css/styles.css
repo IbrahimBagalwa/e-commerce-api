@@ -1,29 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 div {
   min-height: 100vh;
-  text-transform: uppercase;
-  color: red;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  color: cadetblue;
+  font-size: 40px;
 }
-.big-img {
-  background: url("../html/images/big.jpeg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
+
+.one {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../html/images/big.jpeg") center/cover no-repeat fixed;
 }
-.small-img {
-  border: 2px solid red;
-  background: url("../html/images/5666.resized.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-.folder-img {
-  background: url("../html/images/background.jpeg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
+.two {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
 }
