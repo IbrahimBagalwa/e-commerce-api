@@ -3,7 +3,10 @@ const Product = require("../models/Product");
 const getAllStaticProducts = async (req, res) => {
   const products = await Product.find({
     featured: true,
-  });
+  })
+    .select("name price")
+    .limit(3)
+    .sort("name");
   res.status(200).json({
     success: true,
     status: 200,
@@ -24,8 +27,12 @@ const getAllProducts = async (req, res) => {
   if (name) {
     queryObject.name = { $regex: name, $options: "i" };
   }
-  console.log(queryObject);
-  const product = await Product.find(queryObject);
+  let result = Product.find(queryObject);
+  const page = Number(req.query) || 1;
+  const limit = Number(req.query) || 2;
+  const skip = (page - 1) * limit;
+  result = result.skip(skip).limit(skip);
+  const product = await result;
   res.status(200).json({
     success: true,
     status: 200,
