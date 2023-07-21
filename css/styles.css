@@ -1,0 +1,26 @@
+:root {
+  --primaryColor: #1313fa;
+  --secondaryColor: #f15025;
+  --lastCOlor: #32ff0e;
+  --primaryTransition: all 2s linear;
+  --primaryTransform: translate(20px, 20px);
+  --returnTransition: all 3s ease-in-out;
+}
+
+.heading {
+  color: var(--primaryColor);
+  transition: var(--returnTransition);
+}
+.heading:hover {
+  color: var(--lastCOlor);
+  transition: var(--primaryTransition);
+  transform: var(--primaryTransform);
+}
+.text {
+  transition: var(--returnTransition);
+}
+.text:hover {
+  color: var(--lastCOlor);
+  font-size: 2rem;
+  transition: var(--primaryTransition);
+}
