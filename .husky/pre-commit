@@ -1,3 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
+
+npm run lint
+
+# add more custom commands 👇
 npx lint-staged
+npm run pretty-quick
