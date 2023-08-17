@@ -13,6 +13,16 @@
     "prelint": "tsc --noemit",
     "prepare": "husky install"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "npm format"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
