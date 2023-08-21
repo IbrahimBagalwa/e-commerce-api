@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
 import { BadRequestError } from "../errors";
+import { attachCookiesToResponse } from "../helpers/token";
 
 async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
@@ -15,19 +16,18 @@ async function register(req: Request, res: Response) {
   const role = firstFiveUsers ? "admin" : "user";
 
   const user = await User.create({ username, password, email, role });
-  const token = user.createJWT();
-  const oneDay = 1000 * 60 * 60 * 24;
+  const tokenUser = {
+    username: user.username,
+    userId: user._id,
+    role: user.role,
+  };
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
-  });
-
+  attachCookiesToResponse(res, tokenUser);
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
     message: "created successfully",
-    user,
+    user: { ...tokenUser, email: user.email },
   });
 }
 

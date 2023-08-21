@@ -1,14 +1,12 @@
 import validator from "validator";
 import mongoose, { Document } from "mongoose";
 import { encryptPassword, isPasswordValid } from "../helpers/passwordEncDec";
-import { generateToken } from "../helpers/token";
 
 export interface UserDoc extends Document {
   username: string;
   email: string;
   password: string;
   role: string;
-  createJWT: () => string;
   matchPassword: (encryptedPwd: string) => Promise<boolean>;
 }
 
@@ -49,10 +47,6 @@ UserSchema.pre<UserDoc>("save", async function () {
 
 UserSchema.methods.matchPassword = async function (encryptPassword: string) {
   return await isPasswordValid(encryptPassword, this.password);
-};
-
-UserSchema.methods.createJWT = function () {
-  return generateToken(this._id, this.username, this.role);
 };
 
 export default mongoose.model<UserDoc>("User", UserSchema);

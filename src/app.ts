@@ -6,13 +6,16 @@ import "express-async-errors";
 dotenv.config();
 import morgan from "morgan";
 import authRouter from "./routes/authRoute";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 
 app.use(morgan("tiny"));
 app.use(express.json());
+app.use(cookieParser());
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
+  console.log(req.cookies);
   return res.send("backend e-commerce api");
 });
 
