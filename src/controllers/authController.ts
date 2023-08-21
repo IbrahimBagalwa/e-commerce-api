@@ -15,11 +15,13 @@ async function register(req: Request, res: Response) {
   const role = firstFiveUsers ? "admin" : "user";
 
   const user = await User.create({ username, password, email, role });
+  const token = user.createJWT();
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
     message: "created successfully",
     user,
+    token,
   });
 }
 
