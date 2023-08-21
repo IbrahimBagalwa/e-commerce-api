@@ -16,12 +16,18 @@ async function register(req: Request, res: Response) {
 
   const user = await User.create({ username, password, email, role });
   const token = user.createJWT();
+  const oneDay = 1000 * 60 * 60 * 24;
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + oneDay),
+  });
+
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
     message: "created successfully",
     user,
-    token,
   });
 }
 

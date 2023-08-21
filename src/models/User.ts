@@ -52,7 +52,7 @@ UserSchema.methods.matchPassword = async function (encryptPassword: string) {
 };
 
 UserSchema.methods.createJWT = function () {
-  return generateToken(this._id, this.username);
+  return generateToken(this._id, this.username, this.role);
 };
 
 export default mongoose.model<UserDoc>("User", UserSchema);
