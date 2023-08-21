@@ -1,5 +1,6 @@
 import validator from "validator";
 import mongoose from "mongoose";
+import { encryptPassword } from "../helpers/passwordEncDec";
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -28,6 +29,12 @@ const UserSchema = new mongoose.Schema({
     enum: ["admin", "user"],
     default: "user",
   },
+});
+
+UserSchema.pre("save", async function () {
+  if (typeof this.password === "string") {
+    this.password = await encryptPassword(this.password);
+  }
 });
 
 export default mongoose.model("User", UserSchema);
