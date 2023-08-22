@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
-import { BadRequestError, UnAuthorizedError } from "../errors";
+import { BadRequestError, UnAuthenticatedError } from "../errors";
 import { attachCookiesToResponse } from "../helpers/token";
 
 async function register(req: Request, res: Response) {
@@ -41,12 +41,14 @@ async function login(req: Request, res: Response) {
 
   const user = await User.findOne({ email });
   if (!user) {
-    throw new UnAuthorizedError("Account does not exist, please sign up first");
+    throw new UnAuthenticatedError(
+      "Account does not exist, please sign up first",
+    );
   }
 
   const isPasswordMatch = await user.matchPassword(password);
   if (!isPasswordMatch) {
-    throw new UnAuthorizedError("Email or password incorrect");
+    throw new UnAuthenticatedError("Email or password incorrect");
   }
 
   const tokenUser = {
