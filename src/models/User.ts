@@ -1,7 +1,16 @@
 import validator from "validator";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+import { encryptPassword, isPasswordValid } from "../helpers/passwordEncDec";
 
-const UserSchema = new mongoose.Schema({
+export interface UserDoc extends Document {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+  matchPassword: (encryptedPwd: string) => Promise<boolean>;
+}
+
+const UserSchema = new mongoose.Schema<UserDoc>({
   username: {
     type: String,
     required: [true, "Username is required"],
@@ -26,8 +35,18 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["admin", "user"],
-    deafult: "user",
+    default: "user",
   },
 });
 
-export default mongoose.model("User", UserSchema);
+UserSchema.pre<UserDoc>("save", async function () {
+  if (typeof this.password === "string") {
+    this.password = await encryptPassword(this.password);
+  }
+});
+
+UserSchema.methods.matchPassword = async function (encryptPassword: string) {
+  return await isPasswordValid(encryptPassword, this.password);
+};
+
+export default mongoose.model<UserDoc>("User", UserSchema);
