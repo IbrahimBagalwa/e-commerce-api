@@ -36,6 +36,7 @@ async function showCurrentUser(req: Request, res: Response) {
     success: true,
     status: StatusCodes.OK,
     message: "Current user retrieved successfully",
+    user: { ...req.user },
   });
 }
 
