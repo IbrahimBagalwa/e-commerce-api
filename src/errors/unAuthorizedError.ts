@@ -6,8 +6,7 @@ class UnAuthorizedError extends CustomErrorApi {
   success: boolean;
   constructor(message: string) {
     super(message);
-    this.statusCode = StatusCodes.UNAUTHORIZED;
-    this.success = false;
+    (this.statusCode = StatusCodes.FORBIDDEN), (this.success = false);
   }
 }
 

@@ -1,6 +1,13 @@
 import BadRequestError from "./badRequest";
 import CustomErrorApi from "./customApiError";
-import UnAuthorizedError from "./unAuthorizeError";
+import UnAuthenticatedError from "./unAuthenticatedError";
 import NotFoundError from "./notfound";
+import UnAuthorizedError from "./unAuthorizedError";
 
-export { BadRequestError, CustomErrorApi, NotFoundError, UnAuthorizedError };
+export {
+  BadRequestError,
+  CustomErrorApi,
+  NotFoundError,
+  UnAuthenticatedError,
+  UnAuthorizedError,
+};

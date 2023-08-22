@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
-import { BadRequestError, UnAuthorizedError } from "../errors";
+import { BadRequestError, UnAuthenticatedError } from "../errors";
 import { attachCookiesToResponse } from "../helpers/token";
+import createUserToken from "../helpers/createUserToken";
 
 async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
@@ -16,11 +17,7 @@ async function register(req: Request, res: Response) {
   const role = firstFiveUsers ? "admin" : "user";
 
   const user = await User.create({ username, password, email, role });
-  const tokenUser = {
-    username: user.username,
-    userId: user._id,
-    role: user.role,
-  };
+  const tokenUser = createUserToken(user);
 
   attachCookiesToResponse(res, tokenUser);
 
@@ -41,19 +38,17 @@ async function login(req: Request, res: Response) {
 
   const user = await User.findOne({ email });
   if (!user) {
-    throw new UnAuthorizedError("Account does not exist, please sign up first");
+    throw new UnAuthenticatedError(
+      "Account does not exist, please sign up first",
+    );
   }
 
   const isPasswordMatch = await user.matchPassword(password);
   if (!isPasswordMatch) {
-    throw new UnAuthorizedError("Email or password incorrect");
+    throw new UnAuthenticatedError("Email or password incorrect");
   }
 
-  const tokenUser = {
-    username: user.username,
-    userId: user._id,
-    role: user.role,
-  };
+  const tokenUser = createUserToken(user);
 
   attachCookiesToResponse(res, tokenUser);
 
