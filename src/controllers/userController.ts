@@ -5,6 +5,7 @@ import { NotFoundError } from "../errors";
 
 async function getSingleUser(req: Request, res: Response) {
   const { id } = req.params;
+  console.log(req.user);
   const user = await User.findOne({ _id: id, role: "user" }).select(
     "-password",
   );
