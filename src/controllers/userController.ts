@@ -6,6 +6,8 @@ import {
   NotFoundError,
   UnAuthenticatedError,
 } from "../errors";
+import createUserToken from "../helpers/createUserToken";
+import { attachCookiesToResponse } from "../helpers/token";
 
 async function getSingleUser(req: Request, res: Response) {
   const { id } = req.params;
@@ -25,6 +27,7 @@ async function getSingleUser(req: Request, res: Response) {
     user,
   });
 }
+
 async function getAllUsers(req: Request, res: Response) {
   const users = await User.find({ role: "user" }).select("-password");
   res.status(StatusCodes.OK).json({
@@ -45,10 +48,27 @@ async function showCurrentUser(req: Request, res: Response) {
 }
 
 async function updateUser(req: Request, res: Response) {
+  const { username, email } = req.body;
+  if (!username || !email) {
+    throw new BadRequestError("Please provide both username and email");
+  }
+
+  const user = await User.findOneAndUpdate(
+    { _id: req.user.userId },
+    { username, email },
+    { new: true, runValidators: true },
+  );
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+  const tokenUser = createUserToken(user);
+  attachCookiesToResponse(res, tokenUser);
+
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "User updated successfully",
+    user: { ...tokenUser, role: user.role },
   });
 }
 

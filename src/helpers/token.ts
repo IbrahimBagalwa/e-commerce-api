@@ -3,7 +3,7 @@ import { BadRequestError } from "../errors";
 import { Response } from "express";
 
 const { JWT_EXPIRE_IN_HRS, JWT_SECRET_KEY } = process.env;
-interface PayloadUser {
+export interface PayloadUser {
   userId: string;
   username: string;
   role: string;
