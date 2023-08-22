@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
-import { NotFoundError } from "../errors";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnAuthenticatedError,
+} from "../errors";
 
 async function getSingleUser(req: Request, res: Response) {
   const { id } = req.params;
@@ -49,6 +53,21 @@ async function updateUser(req: Request, res: Response) {
 }
 
 async function updateUserPassword(req: Request, res: Response) {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new BadRequestError("Please provide both old and new password");
+  }
+  const user = await User.findOne({ _id: req.user.userId });
+  if (user !== null) {
+    const isPasswordValid = await user.matchPassword(oldPassword);
+
+    if (!isPasswordValid) {
+      throw new UnAuthenticatedError("Invalid credentials");
+    }
+
+    user.password = newPassword;
+    await user.save();
+  }
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
