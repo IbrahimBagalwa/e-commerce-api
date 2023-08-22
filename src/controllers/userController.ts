@@ -8,10 +8,11 @@ import {
 } from "../errors";
 import createUserToken from "../helpers/createUserToken";
 import { attachCookiesToResponse } from "../helpers/token";
+import checkPermissions from "../helpers/checkPermissions";
 
 async function getSingleUser(req: Request, res: Response) {
   const { id } = req.params;
-  console.log(req.user);
+
   const user = await User.findOne({ _id: id, role: "user" }).select(
     "-password",
   );
@@ -19,7 +20,7 @@ async function getSingleUser(req: Request, res: Response) {
   if (!user) {
     throw new NotFoundError(`No user found with id ${id}`);
   }
-
+  checkPermissions(req.user, user._id);
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
