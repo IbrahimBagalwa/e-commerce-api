@@ -7,6 +7,7 @@ dotenv.config();
 import morgan from "morgan";
 import authRouter from "./routes/authRoute";
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/userRoute";
 
 const app: Express = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandler);
