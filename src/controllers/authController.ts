@@ -23,6 +23,7 @@ async function register(req: Request, res: Response) {
   };
 
   attachCookiesToResponse(res, tokenUser);
+
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,

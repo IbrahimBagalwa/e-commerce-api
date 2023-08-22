@@ -12,10 +12,10 @@ const app: Express = express();
 
 app.use(morgan("tiny"));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.JWT_SECRET_KEY));
 
 app.get("/", (req: Request, res: Response) => {
-  console.log(req.cookies);
+  console.log(req.signedCookies);
   return res.send("backend e-commerce api");
 });
 
