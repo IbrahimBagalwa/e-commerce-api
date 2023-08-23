@@ -1,15 +1,20 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import Product from "../models/Product";
 
-function createProduct(req: Request, res: Response) {
+async function createProduct(req: Request, res: Response) {
+  const { userId } = req.user;
+  req.body.user = userId;
+  const product = await Product.create(req.body);
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
     message: "Product created successfully",
+    product,
   });
 }
 
-function getAllProducts(req: Request, res: Response) {
+async function getAllProducts(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
@@ -17,7 +22,7 @@ function getAllProducts(req: Request, res: Response) {
   });
 }
 
-function getSingleProduct(req: Request, res: Response) {
+async function getSingleProduct(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
@@ -25,7 +30,7 @@ function getSingleProduct(req: Request, res: Response) {
   });
 }
 
-function updateProduct(req: Request, res: Response) {
+async function updateProduct(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
@@ -33,7 +38,7 @@ function updateProduct(req: Request, res: Response) {
   });
 }
 
-function deleteProduct(req: Request, res: Response) {
+async function deleteProduct(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
@@ -41,7 +46,7 @@ function deleteProduct(req: Request, res: Response) {
   });
 }
 
-function uploadImage(req: Request, res: Response) {
+async function uploadImage(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,

@@ -9,6 +9,7 @@ import authRouter from "./routes/authRoute";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/userRoute";
 import authenticatedUser from "./middleware/authentication";
+import productRouter from "./routes/productRoute";
 
 const app: Express = express();
 
@@ -22,6 +23,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", authenticatedUser, userRouter);
+app.use("/api/v1/products", authenticatedUser, productRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandler);
