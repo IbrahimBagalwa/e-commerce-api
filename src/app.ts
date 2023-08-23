@@ -10,12 +10,15 @@ import cookieParser from "cookie-parser";
 import userRouter from "./routes/userRoute";
 import authenticatedUser from "./middleware/authentication";
 import productRouter from "./routes/productRoute";
-
+import fileUpload from "express-fileupload";
 const app: Express = express();
 
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET_KEY));
+
+app.use(express.static("./public"));
+app.use(fileUpload({ useTempFiles: true }));
 
 app.get("/", (req: Request, res: Response) => {
   return res.send("backend e-commerce api");
