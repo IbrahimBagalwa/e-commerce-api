@@ -1,16 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UnAuthorizedError } from "../errors";
-import { UserToken } from "./createUserToken";
 import { PayloadUser } from "./token";
 
-type UserResource = Pick<UserToken, "_id">;
-
-const checkPermissions = (
-  requestUser: PayloadUser,
-  resourceUserId: UserResource,
-) => {
+const checkPermissions = (requestUser: PayloadUser, resourceUserId: any) => {
   if (requestUser.role === "admin") return;
   if (requestUser.userId === resourceUserId.toString()) return;
-  throw new UnAuthorizedError("Permission denied");
+  throw new UnAuthorizedError("Permission denied to access this route");
 };
 
 export default checkPermissions;
