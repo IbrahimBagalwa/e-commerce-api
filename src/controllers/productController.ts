@@ -65,11 +65,11 @@ async function updateProduct(req: Request, res: Response) {
 async function deleteProduct(req: Request, res: Response) {
   const { id } = req.params;
 
-  const product = await Product.findOneAndDelete({ _id: id });
+  const product = await Product.findOne({ _id: id });
   if (!product) {
     throw new NotFoundError(`Not product found with id ${id}`);
   }
-
+  await Product.deleteOne();
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
@@ -78,7 +78,6 @@ async function deleteProduct(req: Request, res: Response) {
 }
 
 async function uploadImage(req: Request, res: Response) {
-  console.log(req.files);
   if (!req.files) {
     throw new BadRequestError("No file uploaded");
   }

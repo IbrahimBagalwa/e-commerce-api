@@ -101,11 +101,24 @@ async function deleteReview(req: Request, res: Response) {
   }
 
   checkPermissions(req.user, review.user);
-  await review.deleteOne({});
+  await review.deleteOne();
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
     message: "Review deleted successfully",
+  });
+}
+
+async function getSingleProductReview(req: Request, res: Response) {
+  const { id: productId } = req.params;
+  const review = await Review.find({ product: productId });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    status: StatusCodes.OK,
+    message: "Review Retrieved successfully",
+    review,
+    count: review.length,
   });
 }
 
@@ -115,4 +128,5 @@ export {
   getSingleReview,
   updateReview,
   deleteReview,
+  getSingleProductReview,
 };

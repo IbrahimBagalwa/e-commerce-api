@@ -8,6 +8,7 @@ import {
   uploadImage,
 } from "../controllers/productController";
 import authorizePermissions from "../middleware/authorizePermission";
+import { getSingleProductReview } from "../controllers/reviewController";
 
 const productRouter = express.Router();
 
@@ -23,5 +24,5 @@ productRouter
   .get(getSingleProduct)
   .delete(authorizePermissions("admin", "owner"), deleteProduct)
   .patch(authorizePermissions("admin", "owner"), updateProduct);
-
+productRouter.route("/:id/reviews").get(getSingleProductReview);
 export default productRouter;
