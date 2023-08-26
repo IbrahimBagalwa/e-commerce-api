@@ -7,7 +7,7 @@ import path from "path";
 async function createProduct(req: Request, res: Response) {
   const { userId } = req.user;
   req.body.user = userId;
-  req.body.updateBy = userId;
+  req.body.updatedBy = userId;
   const product = await Product.create(req.body);
   res.status(StatusCodes.CREATED).json({
     success: true,
@@ -44,7 +44,7 @@ async function getSingleProduct(req: Request, res: Response) {
 
 async function updateProduct(req: Request, res: Response) {
   const { id } = req.params;
-  req.body.updateBy = req.user.userId;
+  req.body.updatedBy = req.user.userId;
   const product = await Product.findOneAndUpdate({ _id: id }, req.body, {
     new: true,
     runValidators: true,
@@ -69,7 +69,7 @@ async function deleteProduct(req: Request, res: Response) {
   if (!product) {
     throw new NotFoundError(`Not product found with id ${id}`);
   }
-  await Product.deleteOne();
+  await product.deleteOne();
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,

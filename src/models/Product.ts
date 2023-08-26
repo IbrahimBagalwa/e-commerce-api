@@ -62,7 +62,7 @@ const ProductSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    updateBy: {
+    updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
@@ -86,8 +86,7 @@ ProductSchema.pre(
   "deleteOne",
   { document: true, query: false },
   async function () {
-    const Review = mongoose.model("Review");
-    await Review.deleteMany({ product: this._id });
+    await this.constructor.model("Review").deleteMany({ product: this._id });
   },
 );
 
