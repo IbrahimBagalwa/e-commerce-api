@@ -15,7 +15,7 @@ orderRouter
   .post(createOder)
   .get(authorizePermissions("admin", "owner"), getAllOrder);
 
-orderRouter.route("/currentUserOrder").get(getCurrentUserOrder);
+orderRouter.route("/showAllMyOrders").get(getCurrentUserOrder);
 orderRouter.route("/:id").patch(updateOrder).get(getSingleOrder);
 
 export default orderRouter;

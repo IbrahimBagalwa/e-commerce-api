@@ -29,14 +29,14 @@ async function getCurrentUserOrder(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
-    message: "Oder retrieved successfully",
+    message: "Current User Oder retrieved successfully",
   });
 }
 async function updateOrder(req: Request, res: Response) {
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
-    message: "Oder retrieved successfully",
+    message: "Oder updated successfully",
   });
 }
 
