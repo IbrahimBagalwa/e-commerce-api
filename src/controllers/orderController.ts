@@ -5,6 +5,7 @@ import { BadRequestError, NotFoundError } from "../errors";
 import Product from "../models/Product";
 import fakeStripePayment from "../helpers/fakeStripePayement";
 import Order from "../models/Order";
+import checkPermissions from "../helpers/checkPermissions";
 
 async function createOder(req: Request, res: Response) {
   const { items: cartItems, tax, shippingFee } = req.body;
@@ -59,33 +60,60 @@ async function createOder(req: Request, res: Response) {
 }
 
 async function getAllOrder(req: Request, res: Response) {
+  const orders = await Order.find({});
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "Oders retrieved successfully",
+    orders,
+    count: orders.length,
   });
 }
 
 async function getSingleOrder(req: Request, res: Response) {
+  const orderId = req.params.id;
+  const order = await Order.findOne({ _id: orderId });
+  if (!order) {
+    throw new NotFoundError(`No order found with id ${orderId}`);
+  }
+  checkPermissions(req.user, order.user);
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "Oder retrieved successfully",
+    order,
   });
 }
 
 async function getCurrentUserOrder(req: Request, res: Response) {
+  const userId = req.user.userId;
+  const myOrders = await Order.findOne({ user: userId });
+  if (!myOrders) {
+    throw new NotFoundError("You don't have any orders");
+  }
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "Current User Oder retrieved successfully",
+    myOrders,
   });
 }
 async function updateOrder(req: Request, res: Response) {
+  const orderId = req.params.id;
+  const { paymentIntentId } = req.body;
+  const order = await Order.findOne({ _id: orderId });
+  if (!order) {
+    throw new NotFoundError(`No order found with id ${orderId}`);
+  }
+  checkPermissions(req.user, order.user);
+  order.paymentIntentId = paymentIntentId;
+  order.status = "paid";
+  await order.save();
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "Oder updated successfully",
+    order,
   });
 }
 
