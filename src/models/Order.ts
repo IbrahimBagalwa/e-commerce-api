@@ -17,7 +17,7 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       reequired: true,
     },
-    shippingFree: {
+    shippingFee: {
       type: Number,
       required: true,
     },
@@ -29,7 +29,7 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    cartItems: [singleOrderShema],
+    orderItems: [singleOrderShema],
     status: {
       type: String,
       enum: ["pending", "failed", "paid", "delivered", "cancelled"],
@@ -41,10 +41,6 @@ const OrderSchema = new mongoose.Schema(
       required: true,
     },
     clientSecret: {
-      type: String,
-      required: true,
-    },
-    paymentIntentId: {
       type: String,
       required: true,
     },
