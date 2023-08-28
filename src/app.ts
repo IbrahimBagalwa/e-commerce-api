@@ -15,7 +15,25 @@ import reviewRouter from "./routes/reviewRoute";
 import orderRouter from "./routes/orderRoute";
 import { StatusCodes } from "http-status-codes";
 import path from "path";
+import rateLimiter from "express-rate-limit";
+import helmet from "helmet";
+import cors from "cors";
+import xss from "xss-clean";
+import mongoSanitize from "express-mongo-sanitize";
+
 const app: Express = express();
+
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  }),
+);
+app.use(helmet());
+app.use(cors());
+app.use(mongoSanitize());
+app.use(xss());
 
 app.use(morgan("tiny"));
 app.use(express.json());
