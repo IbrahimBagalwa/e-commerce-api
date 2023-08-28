@@ -54,7 +54,6 @@ ReviewSchema.statics.calculateAverageRating = async function (productId) {
     },
   ]);
   try {
-    // const ReviewModel = mongoose.model('Review');
     const ProductModel = mongoose.model("Product");
     await ProductModel.findOneAndUpdate(
       { _id: productId },
