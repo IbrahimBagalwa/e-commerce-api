@@ -13,6 +13,8 @@ import productRouter from "./routes/productRoute";
 import fileUpload from "express-fileupload";
 import reviewRouter from "./routes/reviewRoute";
 import orderRouter from "./routes/orderRoute";
+import { StatusCodes } from "http-status-codes";
+import path from "path";
 const app: Express = express();
 
 app.use(morgan("tiny"));
@@ -20,10 +22,12 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET_KEY));
 
 app.use(express.static("./public"));
-app.use(fileUpload({ useTempFiles: true }));
+app.use(fileUpload());
 
 app.get("/", (req: Request, res: Response) => {
-  return res.send("backend e-commerce api");
+  res
+    .status(StatusCodes.OK)
+    .sendFile(path.join(__dirname, "./public", "index.html"));
 });
 
 app.use("/api/v1/auth", authRouter);
