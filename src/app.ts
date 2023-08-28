@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import notFoundMiddleware from "./middleware/notFound";
 import errorHandler from "./middleware/errorHandler";
 import dotenv from "dotenv";
@@ -13,8 +13,6 @@ import productRouter from "./routes/productRoute";
 import fileUpload from "express-fileupload";
 import reviewRouter from "./routes/reviewRoute";
 import orderRouter from "./routes/orderRoute";
-import { StatusCodes } from "http-status-codes";
-import path from "path";
 import rateLimiter from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
@@ -41,12 +39,6 @@ app.use(cookieParser(process.env.JWT_SECRET_KEY));
 
 app.use(express.static("./public"));
 app.use(fileUpload());
-
-app.get("/", (req: Request, res: Response) => {
-  res
-    .status(StatusCodes.OK)
-    .sendFile(path.join(__dirname, "./public", "index.html"));
-});
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", authenticatedUser, userRouter);
