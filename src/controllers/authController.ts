@@ -1,9 +1,18 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
-import { BadRequestError, UnAuthenticatedError } from "../errors";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnAuthenticatedError,
+} from "../errors";
 import { attachCookiesToResponse } from "../helpers/token";
 import createUserToken from "../helpers/createUserToken";
+import crypto from "crypto";
+import sendVerifyEmail from "../helpers/sendMail/sendVerifyEmail";
+import hashString from "../helpers/hashString";
+import Token from "../models/Token";
+import sendResetPasswordEmail from "../helpers/sendMail/sendResetPasswordEmail";
 
 async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
@@ -13,22 +22,56 @@ async function register(req: Request, res: Response) {
     throw new BadRequestError("Email already exists");
   }
 
-  const firstFiveUsers = (await User.countDocuments({})) < 4;
-  const role = firstFiveUsers ? "admin" : "user";
+  const isFirstAccount = (await User.countDocuments({})) === 0;
+  const role = isFirstAccount ? "admin" : "user";
+  const verificationToken = crypto.randomBytes(40).toString("hex");
 
-  const user = await User.create({ username, password, email, role });
-  const tokenUser = createUserToken(user);
+  const user = await User.create({
+    username,
+    password,
+    email,
+    role,
+    verificationToken: hashString(verificationToken),
+  });
 
-  attachCookiesToResponse(res, tokenUser);
-
+  const originUrl = "http://localhost:3000";
+  await sendVerifyEmail({
+    username: user.username,
+    email: user.email,
+    originUrl,
+    verificationToken,
+  });
   res.status(StatusCodes.CREATED).json({
     success: true,
     status: StatusCodes.CREATED,
-    message: "created successfully",
-    user: { ...tokenUser, email: user.email },
+    message:
+      "Created successfully, Please check your email to verify your account",
   });
 }
+async function verifyEmail(req: Request, res: Response) {
+  const { email, verificationToken } = req.body;
+  if (!email || !verificationToken) {
+    throw new BadRequestError(
+      "Please provide both values, email and verification token",
+    );
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new NotFoundError("User email does not exist");
+  }
+  if (user.isVerified) {
+    throw new BadRequestError("This user is already verified");
+  }
+  if (user.verificationToken !== hashString(verificationToken)) {
+    throw new UnAuthenticatedError("Token provided is not valid");
+  }
+  user.isVerified = true;
+  user.verified = Date.now();
+  user.verificationToken = "";
 
+  await user.save();
+  res.status(StatusCodes.OK).json({ msg: "Email verified" });
+}
 async function login(req: Request, res: Response) {
   const { email, password } = req.body;
 
@@ -42,6 +85,11 @@ async function login(req: Request, res: Response) {
       "Account does not exist, please sign up first",
     );
   }
+  if (!user.isVerified) {
+    throw new UnAuthenticatedError(
+      "Please verify your account before to login",
+    );
+  }
 
   const isPasswordMatch = await user.matchPassword(password);
   if (!isPasswordMatch) {
@@ -49,8 +97,32 @@ async function login(req: Request, res: Response) {
   }
 
   const tokenUser = createUserToken(user);
+  let refreshToken = "";
+  const existingToken = await Token.findOne({ user: user._id });
 
-  attachCookiesToResponse(res, tokenUser);
+  if (existingToken) {
+    const { isValid } = existingToken;
+    if (!isValid) {
+      throw new UnAuthenticatedError("Invalid credentials token...");
+    }
+    refreshToken = existingToken.refreshToken;
+    attachCookiesToResponse(res, tokenUser, refreshToken);
+    res.status(StatusCodes.OK).json({
+      success: true,
+      status: StatusCodes.OK,
+      message: "Login successfully",
+      user: { ...tokenUser, email: user.email },
+    });
+    return;
+  }
+
+  refreshToken = crypto.randomBytes(40).toString("hex");
+  const userAgent = req.headers["user-agent"];
+  const ip = req.ip;
+  const userToken = { refreshToken, userAgent, ip, user: user._id };
+
+  await Token.create(userToken);
+  attachCookiesToResponse(res, tokenUser, refreshToken);
 
   res.status(StatusCodes.OK).json({
     success: true,
@@ -61,7 +133,12 @@ async function login(req: Request, res: Response) {
 }
 
 async function logout(req: Request, res: Response) {
-  res.cookie("token", "logout", {
+  await Token.findOneAndDelete({ user: req.user.userId });
+  res.cookie("refreshToken", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.cookie("accessToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
   });
@@ -71,4 +148,57 @@ async function logout(req: Request, res: Response) {
     message: "logout successfully",
   });
 }
-export { register, login, logout };
+
+async function forgotPassword(req: Request, res: Response) {
+  const { email } = req.body;
+  if (!email) {
+    throw new BadRequestError("Please email is required");
+  }
+  const user = await User.findOne({ email });
+  if (user) {
+    const passwordToken = crypto.randomBytes(70).toString("hex");
+    await sendResetPasswordEmail({
+      username: user.username,
+      email: user.email,
+      originUrl: "http://localhost:3000",
+      verificationToken: passwordToken,
+    });
+
+    const twentyMinutes = 1000 * 60 * 20;
+    const passwordTokenExpirationDate = new Date(Date.now() + twentyMinutes);
+
+    user.passwordToken = hashString(passwordToken);
+    user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+    await user.save();
+  }
+  res.status(StatusCodes.OK).json({
+    success: true,
+    status: StatusCodes.OK,
+    message: "Please check your email for reset password link",
+  });
+}
+async function resetPassword(req: Request, res: Response) {
+  const { email, token, password } = req.body;
+  if (!email || !token || !password) {
+    throw new BadRequestError("All fields are required");
+  }
+  const user = await User.findOne({ email });
+  if (user) {
+    const currentDate = new Date();
+    if (
+      user.passwordToken === hashString(token) &&
+      user.passwordTokenExpirationDate > currentDate
+    ) {
+      user.password = password;
+      user.passwordToken = "";
+      user.passwordTokenExpirationDate = null;
+      await user.save();
+    }
+  }
+  res.status(StatusCodes.OK).json({
+    success: true,
+    status: StatusCodes.OK,
+    message: "Password reseted successfully",
+  });
+}
+export { register, login, logout, verifyEmail, forgotPassword, resetPassword };
