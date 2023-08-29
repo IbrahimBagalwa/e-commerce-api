@@ -6,8 +6,8 @@ import {
   NotFoundError,
   UnAuthenticatedError,
 } from "../errors";
-import createUserToken from "../helpers/createUserToken";
-import { attachCookiesToResponse } from "../helpers/token";
+// import createUserToken from "../helpers/createUserToken";
+// import { attachCookiesToResponse } from "../helpers/token";
 import checkPermissions from "../helpers/checkPermissions";
 
 async function getSingleUser(req: Request, res: Response) {
@@ -58,18 +58,19 @@ async function updateUser(req: Request, res: Response) {
     { _id: req.user.userId },
     { username, email },
     { new: true, runValidators: true },
-  );
+  ).select("-password");
   if (!user) {
     throw new NotFoundError("User not found");
   }
-  const tokenUser = createUserToken(user);
-  attachCookiesToResponse(res, tokenUser);
+
+  // const tokenUser = createUserToken(user);
+  // attachCookiesToResponse(res, tokenUser,crypto.randomBytes(40).toString("hex"));
 
   res.status(StatusCodes.OK).json({
     success: true,
     status: StatusCodes.OK,
     message: "User updated successfully",
-    user: { ...tokenUser, role: user.role },
+    user: { user },
   });
 }
 
