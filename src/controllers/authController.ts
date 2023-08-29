@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/User";
-import { BadRequestError, UnAuthenticatedError } from "../errors";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnAuthenticatedError,
+} from "../errors";
 import { attachCookiesToResponse } from "../helpers/token";
 import createUserToken from "../helpers/createUserToken";
 import crypto from "crypto";
 import sendVerifyEmail from "../helpers/sendMail/sendVerifyEmail";
+import hashString from "../helpers/hashString";
 
 async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
@@ -24,7 +29,7 @@ async function register(req: Request, res: Response) {
     password,
     email,
     role,
-    verificationToken,
+    verificationToken: hashString(verificationToken),
   });
 
   const originUrl = "http://localhost:3000";
@@ -32,7 +37,7 @@ async function register(req: Request, res: Response) {
     username: user.username,
     email: user.email,
     originUrl,
-    verificationToken: user.verificationToken,
+    verificationToken,
   });
   res.status(StatusCodes.CREATED).json({
     success: true,
@@ -42,6 +47,27 @@ async function register(req: Request, res: Response) {
   });
 }
 async function verifyEmail(req: Request, res: Response) {
+  const { email, verificationToken } = req.body;
+  if (!email || !verificationToken) {
+    throw new BadRequestError(
+      "Please provide both values, email and verification token",
+    );
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new NotFoundError("User email does not exist");
+  }
+  if (user.isVerified) {
+    throw new BadRequestError("This user is already verified");
+  }
+  if (user.verificationToken !== hashString(verificationToken)) {
+    throw new UnAuthenticatedError("Token provided is not valid");
+  }
+  user.isVerified = true;
+  user.verified = Date.now();
+  user.verificationToken = "";
+
+  await user.save();
   res.status(StatusCodes.OK).json({ msg: "Email verified" });
 }
 async function login(req: Request, res: Response) {
