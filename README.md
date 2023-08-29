@@ -20,4 +20,4 @@
 
 ## Documentation
 
-See Swagger documentation for API details [here](https://calm-teal-indri-gear.cyclic.cloud/).
+See Swagger documentation for API details [here](https://e-commerce-api-d9jn.onrender.com).
