@@ -12,6 +12,7 @@ import crypto from "crypto";
 import sendVerifyEmail from "../helpers/sendMail/sendVerifyEmail";
 import hashString from "../helpers/hashString";
 import Token from "../models/Token";
+import sendResetPasswordEmail from "../helpers/sendMail/sendResetPasswordEmail";
 
 async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
@@ -147,4 +148,57 @@ async function logout(req: Request, res: Response) {
     message: "logout successfully",
   });
 }
-export { register, login, logout, verifyEmail };
+
+async function forgotPassword(req: Request, res: Response) {
+  const { email } = req.body;
+  if (!email) {
+    throw new BadRequestError("Please email is required");
+  }
+  const user = await User.findOne({ email });
+  if (user) {
+    const passwordToken = crypto.randomBytes(70).toString("hex");
+    await sendResetPasswordEmail({
+      username: user.username,
+      email: user.email,
+      originUrl: "http://localhost:3000",
+      verificationToken: passwordToken,
+    });
+
+    const twentyMinutes = 1000 * 60 * 20;
+    const passwordTokenExpirationDate = new Date(Date.now() + twentyMinutes);
+
+    user.passwordToken = hashString(passwordToken);
+    user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+    await user.save();
+  }
+  res.status(StatusCodes.OK).json({
+    success: true,
+    status: StatusCodes.OK,
+    message: "Please check your email for reset password link",
+  });
+}
+async function resetPassword(req: Request, res: Response) {
+  const { email, token, password } = req.body;
+  if (!email || !token || !password) {
+    throw new BadRequestError("All fields are required");
+  }
+  const user = await User.findOne({ email });
+  if (user) {
+    const currentDate = new Date();
+    if (
+      user.passwordToken === hashString(token) &&
+      user.passwordTokenExpirationDate > currentDate
+    ) {
+      user.password = password;
+      user.passwordToken = "";
+      user.passwordTokenExpirationDate = null;
+      await user.save();
+    }
+  }
+  res.status(StatusCodes.OK).json({
+    success: true,
+    status: StatusCodes.OK,
+    message: "Password reseted successfully",
+  });
+}
+export { register, login, logout, verifyEmail, forgotPassword, resetPassword };

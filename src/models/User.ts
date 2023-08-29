@@ -11,6 +11,8 @@ export interface UserDoc extends Document {
   verificationToken: string;
   isVerified: boolean;
   verified: any;
+  passwordToken: string;
+  passwordTokenExpirationDate: any;
   matchPassword: (encryptedPwd: string) => Promise<boolean>;
 }
 
@@ -46,6 +48,8 @@ const UserSchema = new mongoose.Schema<UserDoc>({
     default: false,
   },
   verified: Date,
+  passwordToken: String,
+  passwordTokenExpirationDate: Date,
 });
 
 UserSchema.pre<UserDoc>("save", async function () {
